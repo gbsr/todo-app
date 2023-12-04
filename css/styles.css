@@ -1,12 +1,8 @@
 * {
 	margin: 0;
 	padding: 0;
-	font-size: 20px;
+	font-size: 14px;
 	color: rgb(216, 208, 208);
-}
-
-p {
-	/* padding: 0.35rem; */
 }
 
 dialog {
@@ -74,7 +70,7 @@ button {
 	margin-bottom: 0.35rem;
 }
 .notes {
-	font-size: 2rem;
+	font-size: 1.5rem;
 	line-height: 2.85rem;
 	letter-spacing: 0.25rem;
 	display: flex;
