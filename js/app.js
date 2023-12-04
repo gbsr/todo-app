@@ -13,7 +13,18 @@ displayAllNotes(notes);
 
 function displayAllNotes(notes) {
 	notes.forEach((note, index) => {
-		addNewNote(note, index);
+		let text;
+		let completed;
+
+		if (typeof note === 'string') {
+			text = note;
+			completed = false;
+		} else {
+			text = note.text;
+			completed = note.completed;
+		}
+
+		addNewNote(text, index, completed);
 	});
 }
 
@@ -22,7 +33,7 @@ function checkIfNotesExist() {
 	try {
 		notes = JSON.parse(localStorage.getItem('notes'));
 		if (!notes) {
-			// element.style.display = 'none';
+			element.style.opacity = 0;
 			notes = [];
 		}
 	} catch (error) {
@@ -34,7 +45,10 @@ function checkIfNotesExist() {
 
 function handleNewNoteDialog() {
 	document.addEventListener('keydown', function (event) {
-		if (event.key === 'n') {
+		if (event.key.toLowerCase() === 'n') {
+			if (document.activeElement === document.getElementById('noteInput')) {
+				return;
+			}
 			let noteDialog = document.getElementById('noteDialog');
 			noteDialog.showModal();
 
@@ -50,7 +64,7 @@ function handleNewNoteDialog() {
 		let noteText = document.getElementById('noteInput').value;
 
 		// push them to the array
-		notes.push(noteText);
+		notes.push({ text: noteText, completed: false });
 		// store the array into localStorage
 		localStorage.setItem('notes', JSON.stringify(notes));
 		addNewNote(noteText, notes.length - 1);
@@ -59,12 +73,18 @@ function handleNewNoteDialog() {
 	});
 }
 
-function addNewNote(text, index) {
+function addNewNote(text, index, completed) {
+
+	element.style.opacity = 1;
 	let noteContainer = document.createElement('div');
 	noteContainer.classList.add('note');
 	noteContainer.style.display = 'flex';
 	noteContainer.style.alignItems = 'center';
 	noteContainer.style.gap = '1rem';
+
+	if (completed) {
+		noteContainer.classList.add('strike-through');
+	}
 
 	let newNote = document.createTextNode(`${index + 1}: ${text}`);
 	noteContainer.appendChild(newNote);
@@ -73,7 +93,7 @@ function addNewNote(text, index) {
 }
 function handleCompletedDialog() {
 	document.addEventListener('keydown', function (event) {
-		if (event.key === 'c') {
+		if (event.key.toLowerCase() === 'c') {
 			let completedDialog = document.getElementById('completedDialog');
 
 			completedDialog.showModal();
@@ -92,19 +112,14 @@ function handleCompletedDialog() {
 
 function completeTask(noteNumber) {
 	let notes = JSON.parse(localStorage.getItem('notes'));
-	let completedNote = notes[noteNumber];
-	notes.splice(noteNumber, 1);
-	// Select the note element
-	let noteElement = document.querySelectorAll('.note')[noteNumber];
-
-	// Add the 'completed' class to the note element
-	noteElement.classList.add('strike-through');
-
+	notes[noteNumber].completed = true;
+	localStorage.setItem('notes', JSON.stringify(notes));
+	location.reload();
 }
 
 function handleDeleteNoteDialog() {
 	document.addEventListener('keydown', function (event) {
-		if (event.key === 'd') {
+		if (event.key.toLowerCase() === 'd') {
 			let deleteDialog = document.getElementById('deleteDialog');
 			if (deleteDialog.open || noteDialog.open || completedDialog.open) {
 				return;
@@ -118,7 +133,9 @@ function handleDeleteNoteDialog() {
 	document.getElementById('deleteDialog').addEventListener('submit', function (event) {
 		event.preventDefault();
 		let noteNumber = Number(document.getElementById('noteNumber').value);
+
 		deleteNote(noteNumber - 1);
+
 		this.close();
 
 	});
@@ -128,6 +145,15 @@ function deleteNote(noteNumber) {
 	let notes = JSON.parse(localStorage.getItem('notes'));
 	notes.splice(noteNumber, 1);
 	localStorage.setItem('notes', JSON.stringify(notes));
+
+	if (notes.length === 0) {
+		localStorage.removeItem('notes');
+		element.style.opacity = 0;
+	}
+	else {
+		element.style.opacity = 1;
+	}
+
 	location.reload();
 }
 
