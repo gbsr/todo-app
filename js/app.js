@@ -22,6 +22,7 @@ function checkIfNotesExist() {
 	try {
 		notes = JSON.parse(localStorage.getItem('notes'));
 		if (!notes) {
+			// element.style.display = 'none';
 			notes = [];
 		}
 	} catch (error) {
@@ -61,13 +62,6 @@ function addNewNote(text, index) {
 	noteContainer.style.display = 'flex';
 	noteContainer.style.alignItems = 'center';
 	noteContainer.style.gap = '1rem';
-
-	// custom checkbox
-	let label = document.createElement('label'); // Create a label element
-	let checkbox = document.createElement('input');
-	checkbox.type = 'checkbox';
-	label.appendChild(checkbox); // Append the checkbox to the label
-	noteContainer.appendChild(label); // Append the label to the noteContainer
 
 	let newNote = document.createTextNode(`${index + 1}: ${text}`);
 	noteContainer.appendChild(newNote);
