@@ -4,7 +4,7 @@ text = 'this is my new note';
 let note = '';
 
 // add event listener for keydown
-handleDialog();
+handleNewNoteDialog();
 
 let notes = checkIfNotesExist();
 
@@ -32,13 +32,16 @@ function checkIfNotesExist() {
 	return notes;
 }
 
-function handleDialog() {
+function handleNewNoteDialog() {
 	document.addEventListener('keydown', function (event) {
 		if (event.key === 'n') {
 			let noteDialog = document.getElementById('noteDialog');
 			noteDialog.showModal();
 
-
+			// hack to clear the input field, without this, the input field will have the previous value
+			setTimeout(function () {
+				document.getElementById('noteInput').value = '';
+			}, 0);
 		}
 	});
 
@@ -74,6 +77,7 @@ function handleCompletedDialog() {
 			let completedDialog = document.getElementById('completedDialog');
 
 			completedDialog.showModal();
+			document.getElementById('completedTaskNumber').value = '';
 		}
 	});
 
@@ -107,6 +111,7 @@ function handleDeleteNoteDialog() {
 			}
 
 			deleteDialog.showModal();
+			document.getElementById('noteNumber').value = '';
 		}
 	});
 

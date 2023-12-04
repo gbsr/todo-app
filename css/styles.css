@@ -9,6 +9,13 @@ p {
 	/* padding: 0.35rem; */
 }
 
+dialog {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
 .container {
 	height: 100vh;
 	/* margin: auto; */
@@ -22,18 +29,17 @@ p {
 	text-shadow: 0px 0px 10px red;
 }
 
-.complete{
+.complete {
 	font-size: 1.1rem;
 	color: green;
 	text-shadow: 0px 0px 10px green;
-
 }
 
 .strike-through {
-    text-decoration: line-through;
+	text-decoration: line-through;
 }
 
-.create{
+.create {
 	font-size: 1.1rem;
 	color: yellow;
 	text-shadow: 0px 0px 10px yellow;
