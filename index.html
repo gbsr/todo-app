@@ -4,6 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" href="./css/styles.css" />
+		<link rel="stylesheet" href="./css/checkbox.css" />
 		<!-- we use this to put out a request for favicon that returns empty to prevent the error -->
 		<link rel="icon" href="data:," />
 		<script defer src="./js/app.js"></script>
@@ -11,10 +12,28 @@
 	</head>
 	<body>
 		<div class="container">
+			<p>Welcome to ultra-minimalistic todo-list.</p>
+			<p>
+				Press <span class="highlight create">'n'</span> to create a new note, or
+				<span class="highlight del">'d'</span> to delete a note.
+				<p class="end">Press <span class="highlight complete">'c'</span> to complete a task.</p>
+			</p>
 			<div class="notes" id="notes">
 				<dialog id="noteDialog">
 					<form method="dialog">
 						<input id="noteInput" type="text" />
+						<button type="submit">Submit</button>
+					</form>
+				</dialog>
+				<dialog id="completedDialog">
+					<form method="dialog">
+						<input id="completedTaskNumber" type="number" />
+						<button type="submit">Submit</button>
+					</form>
+				</dialog>
+				<dialog id="deleteDialog">
+					<form method="dialog">
+						<input id="noteNumber" type="number" />
 						<button type="submit">Submit</button>
 					</form>
 				</dialog>

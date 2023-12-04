@@ -1,0 +1,35 @@
+/* Hide the default checkbox */
+input[type="checkbox"] {
+	position: absolute;
+	opacity: 0;
+}
+
+/* Create a new checkbox appearance */
+input[type="checkbox"] + label:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1rem; /* Increase this if the checkbox is too small */
+    height: 1rem; /* Increase this if the checkbox is too small */
+    border: 2px solid #fff; /* Change this if it's blending in with the background */
+    border-radius: 3px;
+}
+
+/* Style the checkbox when it's checked */
+input[type="checkbox"]:checked + label:before {
+    background-color: #fff; /* Change this if it's blending in with the background */
+}
+
+/* Add a checkmark when the checkbox is checked */
+input[type="checkbox"]:checked + label:after {
+    content: "";
+    position: absolute;
+    left: 9px;
+    top: 5px;
+    width: 8px;
+    height: 14px;
+    border: solid #c5baba; /* Change this if it's blending in with the background */
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
