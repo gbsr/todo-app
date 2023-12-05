@@ -95,15 +95,18 @@ function handleCompletedDialog() {
 	document.addEventListener('keydown', function (event) {
 		if (event.key.toLowerCase() === 'c') {
 			let completedDialog = document.getElementById('completedDialog');
-
-			completedDialog.showModal();
+			if (deleteDialog.open || noteDialog.open || completedDialog.open) {
+				return;
+			}
 			document.getElementById('completedTaskNumber').value = '';
+			completedDialog.showModal();
 		}
 	});
 
 	document.getElementById('completedDialog').addEventListener('submit', function (event) {
 		event.preventDefault();
 		let noteNumber = Number(document.getElementById('completedTaskNumber').value);
+
 		completeTask(noteNumber - 1);
 		this.close();
 
