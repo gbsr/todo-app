@@ -24,7 +24,8 @@ function checkIfTouchDevice() {
 
 		document.body.addEventListener('touchstart', function (event) {
 			event.preventDefault();
-			console.log('touched');
+			// TODO: make notes here
+			console.log('clicky click');
 		});
 	}
 
@@ -66,33 +67,17 @@ function checkIfNotesExist() {
 }
 
 function handleNewNoteDialog() {
-	document.addEventListener('keydown', function (event) {
-		if (event.key.toLowerCase() === 'n') {
-			if (document.activeElement === document.getElementById('noteInput')) {
-				return;
-			}
-		}
-	});
+	let timeout = null;
+	keyDown();
 	console.log('isTouchDevice: ' + isTouchDevice);
 	if (isTouchDevice) {
-		let container = document.querySelector('.container');
-		document.body.addEventListener('', function (event) {
-			event.preventDefault();
-			console.log('touched');
-			let noteDialog = document.getElementById('noteDialog');
-
-			if (!noteDialog.open) {
-
-				noteDialog.showModal();
-			}
-
-			// hack to clear the input field, without this, the input field will have the previous value
-			setTimeout(function () {
-				document.getElementById('noteInput').value = '';
-			}, 0);
-		});
+		let lastTap = 0;
+		({ lastTap, timeout } = doubleTap(lastTap, timeout));
 	}
 
+	addNote();
+}
+function addNote() {
 	document.getElementById('noteDialog').addEventListener('submit', function (event) {
 		event.preventDefault();
 		let noteText = document.getElementById('noteInput').value;
@@ -106,6 +91,50 @@ function handleNewNoteDialog() {
 		this.close();
 	});
 }
+
+function doubleTap(lastTap, timeout) {
+	document.body.addEventListener('touchend', function (event) {
+		let currentTime = new Date().getTime();
+		let tapLength = currentTime - lastTap;
+		clearTimeout(timeout);
+		if (tapLength < 850 && tapLength > 0) {
+			event.preventDefault();
+			console.log('double tapped');
+			let noteDialog = document.getElementById('noteDialog');
+
+			if (!noteDialog.open) {
+				noteDialog.showModal();
+			}
+
+			// hack to clear the input field, without this, the input field will have the previous value
+			setTimeout(function () {
+				document.getElementById('noteInput').value = '';
+			}, 0);
+		} else {
+			timeout = setTimeout(function () {
+				clearTimeout(timeout);
+			}, 850);
+		}
+		lastTap = currentTime;
+	});
+	return { lastTap, timeout };
+}
+
+function keyDown() {
+	let noteDialog = document.getElementById('noteDialog');
+	document.addEventListener('keydown', function (event) {
+		if (event.key.toLowerCase() === 'n') {
+			if (!noteDialog.open) {
+				noteDialog.showModal();
+			}
+
+			if (document.activeElement === document.getElementById('noteInput')) {
+				return;
+			}
+		}
+	});
+}
+
 function addNewNote(text, index, completed) {
 
 	element.style.opacity = 1;
