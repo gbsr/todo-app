@@ -26,7 +26,8 @@ function checkIfTouchDevice() {
 			event.preventDefault();
 			// TODO: make notes here
 			console.log('clicky click');
-		});
+			// we specifically set event listener passive to false to prevent errors when touch
+		}, { passive: false });
 	}
 
 	console.log('touch is ' + isTouchDevice);
@@ -47,7 +48,7 @@ function displayAllNotes(notes) {
 			completed = note.completed;
 		}
 
-		addNewNote(text, index, completed);
+		createNoteElement(text, index, completed);
 	});
 }
 
@@ -75,9 +76,9 @@ function handleNewNoteDialog() {
 		({ lastTap, timeout } = doubleTap(lastTap, timeout));
 	}
 
-	addNote();
+	handleNoteFormSubmission();
 }
-function addNote() {
+function handleNoteFormSubmission() {
 	document.getElementById('noteDialog').addEventListener('submit', function (event) {
 		event.preventDefault();
 		let noteText = document.getElementById('noteInput').value;
@@ -86,7 +87,7 @@ function addNote() {
 		notes.push({ text: noteText, completed: false });
 		// store the array into localStorage
 		localStorage.setItem('notes', JSON.stringify(notes));
-		addNewNote(noteText, notes.length - 1);
+		createNoteElement(noteText, notes.length - 1);
 		console.log('new note added');
 		this.close();
 	});
@@ -135,10 +136,10 @@ function keyDown() {
 	});
 }
 
-function addNewNote(text, index, completed) {
+function createNoteElement(text, index, completed) {
 
 	element.style.opacity = 1;
-	let noteContainer = document.createElement('div');
+	const noteContainer = document.createElement('div');
 	noteContainer.classList.add('note');
 	noteContainer.style.display = 'flex';
 	noteContainer.style.alignItems = 'center';
@@ -156,6 +157,7 @@ function addNewNote(text, index, completed) {
 }
 
 function handleCompletedDialog() {
+	// for desktop keydown
 	document.addEventListener('keydown', function (event) {
 		if (event.key.toLowerCase() === 'c') {
 			let completedDialog = document.getElementById('completedDialog');
@@ -175,34 +177,41 @@ function handleCompletedDialog() {
 		this.close();
 
 	});
+	// for touches
+	if (isTouchDevice) {
+		const noteContainer = document.querySelector('.notes');
+		const noteElements = Array.from(noteContainer.children).filter(element => element.classList.contains('note'));
+		noteElements.forEach((note, index) => {
+			let touchstartX = 0;
+			let touchendX = 0;
+
+			note.addEventListener('touchstart', function (event) {
+				touchstartX = event.changedTouches[0].screenX;
+				console.log('touch start: ' + event);
+			}, false);
+
+			note.addEventListener('touchend', function (event) {
+				touchendX = event.changedTouches[0].screenX;
+				handleSwipe(index, touchstartX, touchendX);
+				console.log('touch end');
+			}, false);
+
+		});
+	}
+
+}
+
+function handleSwipe(index, touchstartX, touchendX) {
+	let swipeLength = touchstartX - touchendX;
+	if (swipeLength > 100) { // Change this value to adjust the sensitivity
+		completeTask(index);
+		console.log('' + index + ' completed');
+	}
 }
 
 function completeTask(noteNumber) {
 	let notes = JSON.parse(localStorage.getItem('notes'));
 
-	if (isTouchDevice) {
-		let noteContainers = document.querySelectorAll('.noteContainer');
-
-		noteContainers.forEach((noteContainer, index) => {
-			let touchstartX = 0;
-			let touchendX = 0;
-
-			noteContainer.addEventListener('touchstart', function (event) {
-				touchstartX = event.changedTouches[0].screenX;
-			}, false);
-
-			noteContainer.addEventListener('touchend', function (event) {
-				touchendX = event.changedTouches[0].screenX;
-				handleSwipe();
-			}, false);
-
-			function handleSwipe() {
-				if (touchendX < touchstartX) {
-					deleteNote(index);
-				}
-			}
-		});
-	}
 
 	notes[noteNumber].completed = true;
 	localStorage.setItem('notes', JSON.stringify(notes));
