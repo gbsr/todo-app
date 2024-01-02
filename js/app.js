@@ -1,5 +1,5 @@
 let isTouchDevice = false;
-const element = document.getElementById('notes');
+const _notes = document.getElementById('notes');
 
 text = 'this is my new note';
 let note = '';
@@ -7,17 +7,17 @@ let notes = checkIfNotesExist();
 
 isTouchDevice = checkIfTouchDevice();
 handleNewNoteDialog();
-displayAllNotes(notes);
+displayAllNotes(_notes);
 
 function checkIfTouchDevice() {
 	isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
 	if (isTouchDevice) {
 		document.querySelector('.container p:nth-child(1)').innerHTML =
-			"Tap to <span class='highlight create'>'create'</span> a task.";
+			"Double-tap to <span class='highlight create'>'create'</span> a task.";
 
 		document.querySelector('.container p:nth-child(2)').innerHTML =
-			"Swipe <span class='highlight delete'>'right'</span> to delete a task.";
+			"Swipe <span class='highlight del'>'right'</span> to delete a task.";
 
 		document.querySelector('.container p.end').innerHTML =
 			"Swipe <span class='highlight complete'>'left'</span> to complete a task.";
@@ -34,7 +34,7 @@ function checkIfTouchDevice() {
 	return isTouchDevice;
 }
 
-function displayAllNotes(notes) {
+function displayAllNotes(_notes) {
 
 	notes.forEach((note, index) => {
 		let text;
@@ -57,7 +57,7 @@ function checkIfNotesExist() {
 	try {
 		notes = JSON.parse(localStorage.getItem('notes'));
 		if (!notes) {
-			element.style.opacity = 0;
+			_notes.style.opacity = 0;
 			notes = [];
 		}
 	} catch (error) {
@@ -138,7 +138,7 @@ function keyDown() {
 
 function createNoteElement(text, index, completed) {
 
-	element.style.opacity = 1;
+	_notes.style.opacity = 1;
 	const noteContainer = document.createElement('div');
 	noteContainer.classList.add('note');
 	noteContainer.style.display = 'flex';
@@ -151,9 +151,18 @@ function createNoteElement(text, index, completed) {
 	}
 
 	let newNote = document.createTextNode(`${index + 1}: ${text}`);
+	const trashcan = document.createElement('span');
+	// delete note elements
+	trashcan.classList.add('icon', 'trashcan');
+	noteContainer.appendChild(trashcan);
 	noteContainer.appendChild(newNote);
 
-	element.appendChild(noteContainer);
+	// check note elements
+	const check = document.createElement('span');
+	check.classList.add('icon', 'checkmark');
+	noteContainer.appendChild(check);
+
+	_notes.appendChild(noteContainer);
 }
 
 function handleCompletedDialog() {
@@ -180,7 +189,7 @@ function handleCompletedDialog() {
 	// for touches
 	if (isTouchDevice) {
 		const noteContainer = document.querySelector('.notes');
-		const noteElements = Array.from(noteContainer.children).filter(element => element.classList.contains('note'));
+		const noteElements = Array.from(noteContainer.children).filter(notes => notes.classList.contains('note'));
 		noteElements.forEach((note, index) => {
 			let touchstartX = 0;
 			let touchendX = 0;
@@ -192,7 +201,7 @@ function handleCompletedDialog() {
 
 			note.addEventListener('touchend', function (event) {
 				touchendX = event.changedTouches[0].screenX;
-				handleSwipe(index, touchstartX, touchendX);
+				handleSwipe(note, index, touchstartX, touchendX);
 				console.log('touch end');
 			}, false);
 
@@ -201,28 +210,43 @@ function handleCompletedDialog() {
 
 }
 
-function handleSwipe(index, touchstartX, touchendX) {
+function handleSwipe(note, index, touchstartX, touchendX) {
 	let swipeLength = touchstartX - touchendX;
+	// left swipe
 	if (swipeLength > 100) { // Change this value to adjust the sensitivity
-		completeTask(index);
+		completeTask(note, index);
 		console.log('' + index + ' completed');
+	}
+	// right swipe
+	if (swipeLength < -100) { // Change this value to adjust the sensitivity
+		deleteNote(note, index);
+		console.log('' + index + ' deleted');
 	}
 }
 
-function completeTask(noteNumber) {
+function completeTask(note, noteNumber) {
 	let notes = JSON.parse(localStorage.getItem('notes'));
-
 
 	notes[noteNumber].completed = true;
 	localStorage.setItem('notes', JSON.stringify(notes));
-	location.reload();
+	note.classList.add('strike-through');
 }
 
-function deleteNote(noteNumber) {
+function deleteNote(note, noteNumber) {
+	let notes = JSON.parse(localStorage.getItem('notes'));
 	notes.splice(noteNumber, 1);
-	displayNotes();
-}
+	localStorage.setItem('notes', JSON.stringify(notes));
 
+	if (notes.length === 0) {
+		localStorage.removeItem('notes');
+		_notes.style.opacity = 0;
+	}
+	else {
+		_notes.style.opacity = 1;
+	}
+
+	note.remove();
+}
 function handleDeleteNoteDialog() {
 	document.addEventListener('keydown', function (event) {
 		if (event.key.toLowerCase() === 'd') {
@@ -247,21 +271,6 @@ function handleDeleteNoteDialog() {
 	});
 }
 
-function deleteNote(noteNumber) {
-	let notes = JSON.parse(localStorage.getItem('notes'));
-	notes.splice(noteNumber, 1);
-	localStorage.setItem('notes', JSON.stringify(notes));
-
-	if (notes.length === 0) {
-		localStorage.removeItem('notes');
-		element.style.opacity = 0;
-	}
-	else {
-		element.style.opacity = 1;
-	}
-
-	location.reload();
-}
 
 handleDeleteNoteDialog();
 handleCompletedDialog();
