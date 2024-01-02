@@ -14,10 +14,10 @@ function checkIfTouchDevice() {
 
 	if (isTouchDevice) {
 		document.querySelector('.container p:nth-child(1)').innerHTML =
-			"Tap to <span class='highlight create'>'create'</span> a task.";
+			"Double-tap to <span class='highlight create'>'create'</span> a task.";
 
 		document.querySelector('.container p:nth-child(2)').innerHTML =
-			"Swipe <span class='highlight delete'>'right'</span> to delete a task.";
+			"Swipe <span class='highlight del'>'right'</span> to delete a task.";
 
 		document.querySelector('.container p.end').innerHTML =
 			"Swipe <span class='highlight complete'>'left'</span> to complete a task.";
@@ -203,9 +203,15 @@ function handleCompletedDialog() {
 
 function handleSwipe(index, touchstartX, touchendX) {
 	let swipeLength = touchstartX - touchendX;
+	// left swipe
 	if (swipeLength > 100) { // Change this value to adjust the sensitivity
 		completeTask(index);
 		console.log('' + index + ' completed');
+	}
+	// right swipe
+	if (swipeLength < -100) { // Change this value to adjust the sensitivity
+		deleteNote(index);
+		console.log('' + index + ' deleted');
 	}
 }
 
