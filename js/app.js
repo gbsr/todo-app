@@ -91,16 +91,18 @@ function handleNoteFormSubmission() {
 		event.preventDefault();
 		let noteText = document.getElementById('noteInput').value;
 
-		// push them to the array
+		// Get the current notes from localStorage
+		let notes = JSON.parse(localStorage.getItem('notes')) || [];
+		// Push the new note to the array
 		notes.push({ text: noteText, completed: false });
-		// store the array into localStorage
+		// Store the array into localStorage
 		localStorage.setItem('notes', JSON.stringify(notes));
+
 		createNoteElement(noteText, notes.length - 1);
 		console.log('new note added');
 		this.close();
 	});
 }
-
 function doubleTap(lastTap, timeout) {
 	document.body.addEventListener('touchend', function (event) {
 		let currentTime = new Date().getTime();
@@ -261,6 +263,9 @@ function deleteNote(noteNumber) {
 	notes.splice(noteNumber, 1);
 	localStorage.setItem('notes', JSON.stringify(notes));
 
+	// Update the notes variable
+	notes = JSON.parse(localStorage.getItem('notes'));
+
 	if (notes.length === 0) {
 		localStorage.removeItem('notes');
 		_notes.style.opacity = 0;
@@ -269,13 +274,9 @@ function deleteNote(noteNumber) {
 		_notes.style.opacity = 1;
 	}
 
-	// Update the notes variable in the current scope
-	this.notes = notes;
-
 	console.log(noteNumber);  // Log the value of noteNumber
 	displayAllNotes(_notes);  // Update the page render
 }
-
 function handleDeleteNoteDialog() {
 	let notes = JSON.parse(localStorage.getItem('notes'));
 	document.addEventListener('keydown', function (event) {
